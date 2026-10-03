@@ -1,0 +1,26 @@
+name: local-ai
+
+services:
+  llama:
+    image: ghcr.io/ggml-org/llama.cpp:server-vulkan
+    container_name: llama
+    devices:
+      - /dev/dri:/dev/dri
+    volumes:
+      - ./models:/models:ro
+    ports:
+      - "127.0.0.1:${LLAMA_PORT}:8080"
+    command: >
+      -m /models/${MODEL_FILE}
+      --mmproj /models/${MMPROJ_FILE}
+      --host 0.0.0.0 --port 8080
+      -ngl 99
+      -c ${CTX_SIZE}
+      -np 1
+      --jinja
+      --no-mmap
+      ${EXTRA_ARGS:-}
+    restart: "no"
+
+volumes:
+  webui-data:
